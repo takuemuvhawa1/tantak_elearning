@@ -8,12 +8,12 @@ const path = require('path');
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Specify the directory to save files
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Append timestamp to the filename
-  }
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Specify the directory to save files
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Append timestamp to the filename
+    }
 });
 
 const upload = multer({ storage: storage });
@@ -30,35 +30,68 @@ feedbackRouter.post('/', async (req, res) => {
     }
 });
 
+// feedbackRouter.post('/assignment', upload.single('file'), async (req, res, next) => {
+//     try {
+//       let postedValues = req.body;
+
+//       // Extracting fields from the request body
+//       let module_id = postedValues.module_id || null; 
+//       let student_id = postedValues.student_id || null;
+//       let assignment_id = postedValues.assignment_id || null;
+//       let marked = "F";
+//     //   let path = postedValues.file;
+
+//       // Store the uploaded file path in the 'video' field
+//       let path = req.file ? `${pool}/download/${req.file.filename}` : null;
+
+//       // Log the values for debugging
+//       console.log(req.file);
+//       console.log('Values being inserted:', 
+//         module_id, student_id, assignment_id, path, marked );
+
+//       // Call the database operation to insert the lesson
+//       let results = await feedbackDbOperations.postFeedback(
+//         module_id, student_id, assignment_id, path, marked
+//       );
+
+//       // Respond with the results
+//       res.json(results);
+//     } catch (e) {
+//       console.error(e);
+//       res.sendStatus(500); // Send a generic server error response
+//     }
+//   });
+
 feedbackRouter.post('/assignment', upload.single('file'), async (req, res, next) => {
     try {
-      let postedValues = req.body;
-  
-      // Extracting fields from the request body
-      let module_id = postedValues.module_id || null;
-      let student_id = postedValues.student_id || null;
-      let assignment_id = postedValues.assignment_id || null;
-      let marked = "F";
+        let postedValues = req.body;
 
-      // Store the uploaded file path in the 'video' field
-      let path = req.file ? `${pool}/download/${req.file.filename}` : null;
-  
-      // Log the values for debugging
-      console.log('Values being inserted:', 
-        module_id, student_id, assignment_id, path, marked );
-  
-      // Call the database operation to insert the lesson
-      let results = await feedbackDbOperations.postFeedback(
-        module_id, student_id, assignment_id, path, marked
-      );
-  
-      // Respond with the results
-      res.json(results);
+        // Extracting fields from the request body
+        let module_id = postedValues.module_id || null;
+        let student_id = postedValues.student_id || null;
+        let assignment_id = postedValues.assignment_id || null;
+        let marked = postedValues.marked || "";
+
+        // Store the uploaded file path in the 'video' field
+        let path = req.file ? `${pool}/download/${req.file.filename}` : null;
+
+        // Log the values for debugging
+        console.log(req.file);
+        console.log('Values being inserted:',
+            module_id, student_id, assignment_id, path, marked);
+
+        // Call the database operation to insert the lesson
+        let results = await feedbackDbOperations.postFeedback(
+            module_id, student_id, assignment_id, path, marked
+        );
+
+        // Respond with the results
+        res.json(results);
     } catch (e) {
-      console.error(e);
-      res.sendStatus(500); // Send a generic server error response
+        console.error(e);
+        res.sendStatus(500);
     }
-  });
+});
 
 
 // Get all feedback

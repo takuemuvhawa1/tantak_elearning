@@ -37,6 +37,18 @@ collegesRouter.get('/:id', async (req, res) => {
     }
 });
 
+// Get college by Email
+collegesRouter.get('/admin/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await collegesDbOperations.getCollegeByAdminId(id);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 // Update college by ID
 collegesRouter.put('/:id', async (req, res) => {
     try {

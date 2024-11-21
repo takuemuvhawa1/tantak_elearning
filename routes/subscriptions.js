@@ -5,8 +5,8 @@ const subscriptionsDbOperations = require('../cruds/subscriptions');
 // Create a new subscription
 subscriptionsRouter.post('/', async (req, res) => {
     try {
-        const { course_id, student_id, exp_date } = req.body;
-        const results = await subscriptionsDbOperations.postSubscription(course_id, student_id, exp_date);
+        const { course_id, module_id, student_id, amount, exp_date } = req.body;
+        const results = await subscriptionsDbOperations.postSubscription(course_id, module_id, student_id, amount, exp_date);
         res.json(results);
     } catch (e) {
         console.log(e);
@@ -43,6 +43,41 @@ subscriptionsRouter.get('/student/:studentId/:courseId', async (req, res) => {
         const studentId = req.params.studentId;
         const courseId = req.params.courseId;
         const result = await subscriptionsDbOperations.getSubscriptionByStudentIdAndCourse(studentId, courseId);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+// Get All subscription by student ID
+subscriptionsRouter.get('/student/:studentId', async (req, res) => {
+    try {
+        const studentId = req.params.studentId;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByStudentIdAndCourse(studentId);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+// Get All subscription by module
+subscriptionsRouter.get('/module/mod/:module', async (req, res) => {
+    try {
+        const moduleId = req.params.module;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByModule(moduleId);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+// Get All subscription by student ID
+subscriptionsRouter.get('/student/:studentId', async (req, res) => {
+    try {
+        const studentId = req.params.studentId;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByStudentIdAndCourse(studentId);
         res.json(result);
     } catch (e) {
         console.log(e);

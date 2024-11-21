@@ -48,4 +48,20 @@ onBoardingRouter.post('/login', async (req, res) => {
     }
 });
 
+onBoardingRouter.post('/resetpassword', async (req, res) => {
+    try {
+        const { email, oldPassword, newPassword } = req.body; 
+
+         // Hash the password using MD5
+         const hashedOldPassword = crypto.createHash('md5').update(oldPassword).digest('hex');
+         const hashedPassword = crypto.createHash('md5').update(newPassword).digest('hex');
+
+        let result = await onBoardingDbOperations.resetPassword(email, hashedOldPassword, hashedPassword);
+        res.status(result.status).json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 module.exports = onBoardingRouter;

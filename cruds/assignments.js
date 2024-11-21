@@ -3,11 +3,11 @@ const pool = require('./poolfile');
 
 let assignmentsObj = {};
 
-assignmentsObj.postAssignment = (module_id, type, topic, description) => {
+assignmentsObj.postAssignment = (module_id, type, topic, path) => {
     return new Promise((resolve, reject) => {
         pool.query(
-            'INSERT INTO assignments(module_id, type, topic, description) VALUES (?, ?, ?, ?)', 
-            [module_id, type, topic, description], 
+            'INSERT INTO assignments(module_id, type, topic, path) VALUES (?, ?, ?, ?)', 
+            [module_id, type, topic, path], 
             (err, result) => {
                 if (err) return reject(err);
                 return resolve({ status: '200', message: 'Assignment record added successfully' });

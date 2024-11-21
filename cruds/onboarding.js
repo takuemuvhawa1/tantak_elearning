@@ -37,4 +37,29 @@ crudsObj.authenticateUser = async (email, password) => {
     });
 };
 
+crudsObj.resetPassword = async (email, oldPassword, newPassword) => {
+    return new Promise((resolve, reject) => {
+        // Check if the email exists and the old password is valid
+        pool.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, oldPassword], async (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            if (results.length === 0) {
+                return resolve({ status: '401', message: 'Invalid email or password' });
+            }
+
+            // Update the password
+            pool.query('UPDATE users SET password = ? WHERE email = ?', [newPassword, email], async (err, results) => {
+                if (err) {
+                    return reject(err);
+                }
+
+
+
+                    return resolve({ status: '200', message: 'Password reset successfully'});
+            });
+        });
+    });
+};
+
 module.exports = crudsObj;

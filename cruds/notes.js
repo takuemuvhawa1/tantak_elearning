@@ -3,11 +3,11 @@ const pool = require('./poolfile');
 
 let notesObj = {};
 
-notesObj.postNote = (module_id, title, author) => {
+notesObj.postNote = (module_id, title, author, path) => {
     return new Promise((resolve, reject) => {
         pool.query(
-            'INSERT INTO notes(module_id, title, author) VALUES (?, ?, ?)', 
-            [module_id, title, author], 
+            'INSERT INTO notes(module_id, title, author, path) VALUES (?, ?, ?, ?)', 
+            [module_id, title, author, path], 
             (err, result) => {
                 if (err) return reject(err);
                 return resolve({ status: '200', message: 'Note record added successfully' });

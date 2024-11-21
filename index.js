@@ -3,7 +3,19 @@ require('dotenv').config();
 const cors = require('cors');
 const https = require('https');
 
+// const axios = require('axios');
+
+
 // const membersDbOperations = require('./cruds/member'); 
+
+// Peses pay
+const { Pesepay } = require('pesepay');
+
+//Payment Gateway
+
+const resultUrl = 'http://localhost:3000/dashboard'; // Update with your result URL
+const returnUrl = 'http://localhost:3000/dashboard'; // Update with your return URL
+const pesepayInstance = new Pesepay("96aa2f37-063a-4b4f-ae30-c6332e985db8", "f3e0d62f7b6640f5b3fef5e8d545278e");
 
 // Auth
 const authenticateToken = require('./utilities/authenticateToken');
@@ -117,20 +129,122 @@ app.get('/file/:filename', (req, res) => {
 
   // Stream the file as the response
   res.sendFile(filePath);
-}); 
+});
 
 // Endpoint for downloading files
 app.get('/download/:filename', (req, res) => {
   const filename = req.params.filename;
-  const filePath = path.join(__dirname, 'uploads', filename); 
+  const filePath = path.join(__dirname, 'uploads', filename);
 
   res.download(filePath, (err) => {
     if (err) {
-      console.error('Error downloading file:', err); 
+      console.error('Error downloading file:', err);
       res.status(404).send('File not found.');
     }
   });
 });
+
+app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date', async (req, res) => {
+  try {
+    const course_id = req.params.course_id;
+    const module_id = req.params.module_id;
+    const student_id = req.params.student_id;
+    const amount = req.params.amount;
+    const exp_date = req.params.exp_date;
+
+
+    const currencyCode = 'USD'; // Update with the actual currency code
+    const paymentReason = 'E-Learning subscription'; // Update with the actual payment reason
+
+    const transaction = pesepayInstance.createTransaction(amount, currencyCode, paymentReason);
+
+    pesepayInstance.resultUrl = resultUrl;
+    pesepayInstance.returnUrl = returnUrl;
+
+    pesepayInstance.initiateTransaction(transaction).then(response => {
+      console.log(response);
+      if (response.success) {
+        const redirectUrl = response.redirectUrl;
+        const referenceNumber = response.referenceNumber;
+        const pollUrl = response.pollUrl;
+
+        // Check payment status
+        pesepayInstance.pollTransaction(pollUrl).then(response => {
+          if (response.success) {
+            if (response.paid) {
+              console.log('Payment was successful');
+            } else {
+              console.log('Payment is pending');
+
+              let loops = 0;
+              let paymentProcessed = false; // Flag to prevent double posting
+              const intervalId = setInterval(() => {
+                pesepayInstance.checkPayment(referenceNumber).then(response => {
+                  if (response.success) {
+                    if (response.paid && !paymentProcessed) {
+                      console.log('Payment was successful');
+
+                      const axios = require('axios');
+
+                      // Sample data to post
+                      const data = {
+                        course_id,
+                        module_id,
+                        student_id,
+                        amount,
+                        exp_date
+                      };
+
+                      // Post request
+                      axios.post(`${pool}/subscriptions/`, data)
+                        .then(response => {
+                          console.log('Response Data:', response.data);
+                        })
+                        .catch(error => {
+                          console.error('Error:', error);
+                        });
+
+                      paymentProcessed = true; // Set the flag to true to prevent further posting
+                      clearInterval(intervalId);
+                    }
+                  } else {
+                    console.error(`Error: ${response.message}`);
+                  }
+                }).catch(error => {
+                  console.error(error);
+                });
+                loops++;
+                if (loops >= 18) {
+                  clearInterval(intervalId);
+                }
+              }, 5000); // Check every 5 seconds
+            }
+          } else {
+            console.error(`Error: ${response.message}`);
+          }
+        }).catch(error => {
+          console.error(error);
+        });
+
+        res.redirect(redirectUrl);
+      } else {
+        console.error(`Error: ${response.message}`);
+        res.status(500).send({ error: 'Failed to initiate payment' });
+      }
+    }).catch(error => {
+      console.error(error);
+      res.status(500).send({ error: 'Failed to initiate payment' });
+    });
+
+
+
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+});
+
+
 
 // const options = {
 //   cert: fs.readFileSync(`${process.env.HOME}/cert/cert.pem`),

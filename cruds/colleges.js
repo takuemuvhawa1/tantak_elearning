@@ -34,6 +34,15 @@ collegesObj.getCollegeById = (college_id) => {
     });
 };
 
+collegesObj.getCollegeByAdminId = (id) => {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM colleges WHERE admin_id = ?', [id], (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+};
+
 collegesObj.updateCollege = (college_id, name, description, profile_pic, adminId) => {
     return new Promise((resolve, reject) => {
         pool.query('UPDATE colleges SET name = ?, description = ?, profile_pic = ?, admin_id = ?  WHERE college_id = ?',

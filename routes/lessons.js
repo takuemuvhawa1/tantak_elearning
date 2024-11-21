@@ -21,8 +21,8 @@ const upload = multer({ storage: storage });
 // Create a new lesson
 lessonsRouter.post('/', async (req, res) => {
     try {
-        const { module_id, lesson_no, topic, objectives, assignment, video, date_posted, release_date } = req.body;
-        const results = await lessonsDbOperations.postLesson(module_id, lesson_no, topic, objectives, assignment, video, date_posted, release_date);
+        const { module_id, lesson_no, topic, objectives, assignment, video, release_date } = req.body;
+        const results = await lessonsDbOperations.postLesson(module_id, lesson_no, topic, objectives, assignment, video, release_date);
         res.json(results);
     } catch (e) {
         console.log(e);

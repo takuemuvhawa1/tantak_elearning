@@ -3,11 +3,11 @@ const pool = require('./poolfile');
 
 let resultsObj = {};
 
-resultsObj.postResult = (module_id, student_id, assignment_id, marks, percentage, grade, date) => {
+resultsObj.postResult = (module_id, student_id, assignment_id, marks, total_possible, percentage, grade) => {
     return new Promise((resolve, reject) => {
         pool.query(
-            'INSERT INTO results(module_id, student_id, assignment_id, marks, percentage, grade, date) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-            [module_id, student_id, assignment_id, marks, percentage, grade, date], 
+            'INSERT INTO results(module_id, student_id, assignment_id, marks, total_possible, percentage, grade) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+            [module_id, student_id, assignment_id, marks, total_possible, percentage, grade], 
             (err, result) => {
                 if (err) return reject(err);
                 return resolve({ status: '200', message: 'Result record added successfully' });

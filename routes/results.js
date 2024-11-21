@@ -5,8 +5,9 @@ const resultsDbOperations = require('../cruds/results');
 // Create a new result
 resultsRouter.post('/', async (req, res) => {
     try {
-        const { module_id, student_id, assignment_id, marks, percentage, grade, date } = req.body;
-        const results = await resultsDbOperations.postResult(module_id, student_id, assignment_id, marks, percentage, grade, date);
+        const { module_id, student_id, assignment_id, marks, total_possible, percentage, grade } = req.body;
+        console.log(req.body);
+        const results = await resultsDbOperations.postResult(module_id, student_id, assignment_id, marks, total_possible, percentage, grade);
         res.json(results);
     } catch (e) {
         console.log(e);
@@ -34,7 +35,7 @@ resultsRouter.get('/:id', async (req, res) => {
     } catch (e) {
         console.log(e);
         res.sendStatus(500);
-    }
+    }   
 });
 
 // Get result by student ID
