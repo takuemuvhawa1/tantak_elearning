@@ -13,8 +13,10 @@ const { Pesepay } = require('pesepay');
 
 //Payment Gateway
 
-const resultUrl = 'http://localhost:3000/dashboard'; // Update with your result URL
-const returnUrl = 'http://localhost:3000/dashboard'; // Update with your return URL
+// const resultUrl = 'http://localhost:3000/dashboard'; // Update with your result URL
+// const returnUrl = 'http://localhost:3000/dashboard'; // Update with your return URL
+const resultUrl = 'https://tantak-portal.netlify.app/dashboard'; // Update with your result URL
+const returnUrl = 'https://tantak-portal.netlify.app/dashboard'; // Update with your return URL
 const pesepayInstance = new Pesepay("96aa2f37-063a-4b4f-ae30-c6332e985db8", "f3e0d62f7b6640f5b3fef5e8d545278e");
 
 // Auth
