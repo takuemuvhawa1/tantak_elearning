@@ -47,24 +47,37 @@ const assignmentsRouter = require('./routes/assignments');
 const notesRouter = require('./routes/notes');
 const resultsRouter = require('./routes/results');
 const feedbackRouter = require('./routes/feedback');
+const accountRouter = require('./routes/account');
+const pendingRouter = require('./routes/acc_pending');
+
+const corsOptions = {
+  // origin: ['http://localhost:3000', 'http://localhost:3003/account/cashout' ],
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200,
+};
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 //App Route Usage
 app.use('/users', userRouter);
 app.use('/mailer', mailerRouter);
 app.use('/onboarding', onBoardingRouter);
-app.use('/colleges', collegesRouter);
-app.use('/courses', coursesRouter);
-app.use('/modules', modulesRouter);
-app.use('/lessons', lessonsRouter);
+app.use('/colleges', authenticateToken, collegesRouter);
+app.use('/courses', authenticateToken, coursesRouter);
+app.use('/modules', authenticateToken, modulesRouter);
+app.use('/lessons', authenticateToken, lessonsRouter);
 app.use('/subscriptions', subscriptionsRouter);
-app.use('/assignments', assignmentsRouter);
-app.use('/notes', notesRouter);
-app.use('/results', resultsRouter);
-app.use('/feedback', feedbackRouter);
+app.use('/assignments', authenticateToken, assignmentsRouter);
+app.use('/notes', authenticateToken, notesRouter);
+app.use('/results', authenticateToken, resultsRouter);
+app.use('/feedback', authenticateToken, feedbackRouter);
+app.use('/account', accountRouter);
+app.use('/accpending', pendingRouter);
 
 //FILE UPLOADS
 const storage = multer.diskStorage({
@@ -146,6 +159,55 @@ app.get('/download/:filename', (req, res) => {
   });
 });
 
+// app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date', async (req, res) => {
+
+//   console.log("Point reached")
+
+//   const course_id = req.params.course_id;
+//   const module_id = req.params.module_id;
+//   const student_id = req.params.student_id;
+//   const amount = req.params.amount;
+//   const exp_date = req.params.exp_date;
+
+//   const axios = require('axios');
+
+//   // Sample data to post
+//   const data = {
+//     course_id,
+//     module_id,
+//     student_id,
+//     amount,
+//     exp_date
+//   };
+
+//   const data2 = {
+//     module_id,
+//     student_id,
+//     amount
+//   };
+
+//   // Post request
+//   axios.post(`${pool}/subscriptions/`, data)
+//     .then(response => {
+//       console.log('Response Data:', response.data);
+//     })
+//     .catch(error => {
+//       console.error('Error:', error);
+//     });
+
+//   // Post to accounts
+//   axios.post(`${pool}/account/`, data2)
+//     .then(response => {
+//       console.log('Response Data:', response.data);
+//     })
+//     .catch(error => {
+//       console.error('Error:', error);
+//     });
+
+// }
+
+// );
+
 app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date', async (req, res) => {
   try {
     const course_id = req.params.course_id;
@@ -197,8 +259,23 @@ app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date',
                         exp_date
                       };
 
+                      const data2 = {
+                        module_id,
+                        student_id,
+                        amount
+                      };
+
                       // Post request
                       axios.post(`${pool}/subscriptions/`, data)
+                        .then(response => {
+                          console.log('Response Data:', response.data);
+                        })
+                        .catch(error => {
+                          console.error('Error:', error);
+                        });
+
+                      // Post to accounts
+                      axios.post(`${pool}/account/`, data2)
                         .then(response => {
                           console.log('Response Data:', response.data);
                         })

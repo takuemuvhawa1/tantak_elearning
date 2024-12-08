@@ -32,7 +32,7 @@ assignmentsRouter.post('/', async (req, res) => {
     }
 });
 
-assignmentsRouter.post('/assignment', upload.single('file'), async (req, res, next) => {
+assignmentsRouter.post('/assignment', upload.single('file'), async (req, res, next) => { 
     try {
         let postedValues = req.body;
 

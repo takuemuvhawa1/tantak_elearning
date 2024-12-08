@@ -44,11 +44,12 @@ feedbackObj.getFeedbackById = (feedback_id) => {
 //         });
 //     });
 // };
+
 //MARKED ASSIGNMENTS
 feedbackObj.getFeedbackSubmittedById = (modID, stuID) => {
     return new Promise((resolve, reject) => {
         const marked = "F";
-        pool.query('SELECT f.*, a.topic, a.type, u.name, u.surname FROM feedback f JOIN assignments a ON a.assignment_id = f.assignment_id JOIN users u ON f.student_id = u.user_id WHERE f.module_id = ? AND f.student_id = ? AND f.marked = ?', [modID, stuID, marked], (err, results) => {
+        pool.query('SELECT f.*, a.topic, a.type, u.name, u.surname FROM feedback f JOIN assignments a ON a.assignment_id = f.assignment_id JOIN users u ON f.student_id = u.user_id WHERE f.module_id = ? AND f.student_id = ? AND f.marked = ? ORDER BY feedback_id DESC', [modID, stuID, marked], (err, results) => {
             if (err) return reject(err);
             return resolve(results);
         });
@@ -59,7 +60,29 @@ feedbackObj.getFeedbackSubmittedById = (modID, stuID) => {
 feedbackObj.getFeedbackMarkedById = (modID, stuID) => {
     return new Promise((resolve, reject) => {
         const marked = "T";
-        pool.query('SELECT f.*, a.topic, a.type, u.name, u.surname FROM feedback f JOIN assignments a ON a.assignment_id = f.assignment_id JOIN users u ON f.student_id = u.user_id WHERE f.module_id = ? AND f.student_id = ? AND f.marked = ?', [modID, stuID, marked], (err, results) => {
+        pool.query('SELECT f.*, a.topic, a.type, u.name, u.surname FROM feedback f JOIN assignments a ON a.assignment_id = f.assignment_id JOIN users u ON f.student_id = u.user_id WHERE f.module_id = ? AND f.student_id = ? AND f.marked = ? ORDER BY feedback_id DESC', [modID, stuID, marked], (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+};
+
+//MARKED ASSIGNMENTS PER MODULE
+feedbackObj.getFeedbackSubmittedByIdPerModule = (modID, stuID) => {
+    return new Promise((resolve, reject) => {
+        const marked = "F";
+        pool.query('SELECT f.*, a.topic, a.type, u.name, u.surname FROM feedback f JOIN assignments a ON a.assignment_id = f.assignment_id JOIN users u ON f.student_id = u.user_id WHERE f.module_id = ? AND f.marked = ? ORDER BY feedback_id DESC', [modID, marked], (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+};
+
+//SUBMIT ASSIGNMENTS PER MODULE
+feedbackObj.getFeedbackMarkedByIdPerModule = (modID) => {
+    return new Promise((resolve, reject) => {
+        const marked = "T";
+        pool.query('SELECT f.*, a.topic, a.type, u.name, u.surname FROM feedback f JOIN assignments a ON a.assignment_id = f.assignment_id JOIN users u ON f.student_id = u.user_id WHERE f.module_id = ? AND f.marked = ? ORDER BY feedback_id DESC', [modID, marked], (err, results) => {
             if (err) return reject(err);
             return resolve(results);
         });

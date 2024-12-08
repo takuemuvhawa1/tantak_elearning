@@ -36,7 +36,16 @@ resultsObj.getResultById = (result_id) => {
 
 resultsObj.getResultStudentById = (modID, stuID) => {
     return new Promise((resolve, reject) => {
-        pool.query('SELECT * FROM results WHERE module_id = ? AND student_id = ?', [modID, stuID], (err, results) => {
+        pool.query('SELECT r.*, a.topic FROM results r JOIN assignments a ON a.assignment_id = r.assignment_id WHERE r.module_id = ? AND r.student_id = ? ORDER BY r.result_id DESC', [modID, stuID], (err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
+    });
+};
+
+resultsObj.getResultModuleById = (modID) => {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT r.*, a.topic, u.name, u.surname FROM results r JOIN assignments a ON a.assignment_id = r.assignment_id JOIN users u ON u.user_id = r.student_id WHERE r.module_id = ? ORDER BY r.result_id DESC', [modID], (err, results) => {
             if (err) return reject(err);
             return resolve(results);
         });

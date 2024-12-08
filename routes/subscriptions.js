@@ -1,6 +1,8 @@
 const express = require('express');
 const subscriptionsRouter = express.Router();
 const subscriptionsDbOperations = require('../cruds/subscriptions');
+const authenticateToken = require('../utilities/authenticateToken'); 
+
 
 // Create a new subscription
 subscriptionsRouter.post('/', async (req, res) => {
@@ -15,7 +17,7 @@ subscriptionsRouter.post('/', async (req, res) => {
 });
 
 // Get all subscriptions
-subscriptionsRouter.get('/', async (req, res) => {
+subscriptionsRouter.get('/', authenticateToken, async (req, res) => {
     try {
         const results = await subscriptionsDbOperations.getSubscriptions();
         res.json(results);
@@ -26,7 +28,7 @@ subscriptionsRouter.get('/', async (req, res) => {
 });
 
 // Get subscription by ID
-subscriptionsRouter.get('/:id', async (req, res) => {
+subscriptionsRouter.get('/:id', authenticateToken, async (req, res) => {
     try {
         const id = req.params.id;
         const result = await subscriptionsDbOperations.getSubscriptionById(id);
@@ -38,11 +40,12 @@ subscriptionsRouter.get('/:id', async (req, res) => {
 });
 
 // Get subscription by student ID AND Course
-subscriptionsRouter.get('/student/:studentId/:courseId', async (req, res) => {
+subscriptionsRouter.get('/student/:studentId/:courseId/:currentDate', authenticateToken, async (req, res) => {
     try {
         const studentId = req.params.studentId;
         const courseId = req.params.courseId;
-        const result = await subscriptionsDbOperations.getSubscriptionByStudentIdAndCourse(studentId, courseId);
+        const currentDate = req.params.currentDate;
+        const result = await subscriptionsDbOperations.getSubscriptionByStudentIdAndCourse(studentId, courseId, currentDate);
         res.json(result);
     } catch (e) {
         console.log(e);
@@ -51,10 +54,11 @@ subscriptionsRouter.get('/student/:studentId/:courseId', async (req, res) => {
 });
 
 // Get All subscription by student ID
-subscriptionsRouter.get('/student/:studentId', async (req, res) => {
+subscriptionsRouter.get('/student/:studentId/:currentDate', authenticateToken, async (req, res) => {
     try {
         const studentId = req.params.studentId;
-        const result = await subscriptionsDbOperations.getAllSubscriptionByStudentIdAndCourse(studentId);
+        const currentDate = req.params.currentDate;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByStudentIdAndCourse(studentId, currentDate);
         res.json(result);
     } catch (e) {
         console.log(e);
@@ -63,18 +67,46 @@ subscriptionsRouter.get('/student/:studentId', async (req, res) => {
 });
 
 // Get All subscription by module
-subscriptionsRouter.get('/module/mod/:module', async (req, res) => {
+subscriptionsRouter.get('/module/mod/:module/:currentDate', authenticateToken, async (req, res) => {
     try {
         const moduleId = req.params.module;
-        const result = await subscriptionsDbOperations.getAllSubscriptionByModule(moduleId);
+        const currentDate = req.params.currentDate;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByModule(moduleId, currentDate);
         res.json(result);
     } catch (e) {
         console.log(e);
         res.sendStatus(500);
     }
 });
+
+// Get All subscription by course
+subscriptionsRouter.get('/course/mod/:course/:date', authenticateToken, async (req, res) => {
+    try {
+        const courseId = req.params.course;
+        const date = req.params.date;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByCourse(courseId, date);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+// Get All subscription by course
+subscriptionsRouter.get('/college/mod/:college/:date', authenticateToken, async (req, res) => {
+    try {
+        const collegeId = req.params.college;
+        const date = req.params.date;
+        const result = await subscriptionsDbOperations.getAllSubscriptionByCollege(collegeId, date);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 // Get All subscription by student ID
-subscriptionsRouter.get('/student/:studentId', async (req, res) => {
+subscriptionsRouter.get('/student/:studentId', authenticateToken, async (req, res) => {
     try {
         const studentId = req.params.studentId;
         const result = await subscriptionsDbOperations.getAllSubscriptionByStudentIdAndCourse(studentId);
@@ -86,7 +118,7 @@ subscriptionsRouter.get('/student/:studentId', async (req, res) => {
 });
 
 // Update subscription by ID
-subscriptionsRouter.put('/:id', async (req, res) => {
+subscriptionsRouter.put('/:id', authenticateToken, async (req, res) => {
     try {
         const id = req.params.id;
         const { course_id, student_id, exp_date } = req.body;
@@ -99,7 +131,7 @@ subscriptionsRouter.put('/:id', async (req, res) => {
 });
 
 // Delete subscription by ID
-subscriptionsRouter.delete('/:id', async (req, res) => {
+subscriptionsRouter.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const id = req.params.id;
         const result = await subscriptionsDbOperations.deleteSubscription(id);

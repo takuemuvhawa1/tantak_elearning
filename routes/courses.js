@@ -105,6 +105,20 @@ coursesRouter.put('/:id', async (req, res) => {
     }
 });
 
+// Update course by ID 2
+coursesRouter.put('/update/:id', upload.none(), async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { name, description } = req.body;
+        console.log(req.body)
+        const result = await coursesDbOperations.updateCourse2(id, name, description);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 // Delete course by ID
 coursesRouter.delete('/:id', async (req, res) => {
     try {

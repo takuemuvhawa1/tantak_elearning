@@ -143,6 +143,32 @@ feedbackRouter.get('/submitted/:modID/:stuID', async (req, res) => {
     }
 });
 
+// Get feedback MARKED by ID PER MODULE
+feedbackRouter.get('/marked/:modID', async (req, res) => {
+    try {
+        const modID = req.params.modID;
+        const stuID = req.params.stuID;
+        const result = await feedbackDbOperations.getFeedbackMarkedByIdPerModule(modID);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+// Get feedback SUBMITTED by ID PER MODULE
+feedbackRouter.get('/submitted/:modID', async (req, res) => {
+    try {
+        const modID = req.params.modID;
+        const stuID = req.params.stuID;
+        const result = await feedbackDbOperations.getFeedbackSubmittedByIdPerModule(modID);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 // Update feedback by ID
 feedbackRouter.put('/:id', async (req, res) => {
     try {

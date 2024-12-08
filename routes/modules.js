@@ -21,8 +21,8 @@ const upload = multer({ storage: storage });
 // Create a new module
 modulesRouter.post('/', async (req, res) => {
     try {
-        const { course_id, name, description, instructor, profile_pic } = req.body;
-        const results = await modulesDbOperations.postModule(course_id, name, description, instructor, profile_pic);
+        const { course_id, name, description, instructor, price, profile_pic } = req.body;
+        const results = await modulesDbOperations.postModule(course_id, name, description, instructor, price, profile_pic);
         res.json(results);
     } catch (e) {
         console.log(e);
@@ -39,13 +39,15 @@ modulesRouter.post('/module', upload.single('file'), async (req, res, next) => {
       let name = postedValues.name || null;
       let description = postedValues.description || null;
       let instructor = postedValues.instructor || null;
+      let price = postedValues.price || null;
       
       // Store the uploaded file path in the 'video' field
       let profile_pic = req.file ? `${pool}/file/${req.file.filename}` : null;
   
       // Call the database operation to insert the lesson
+      console.log(course_id, name, description, instructor, price, profile_pic)
       let results = await modulesDbOperations.postModule(
-        course_id, name, description, instructor, profile_pic
+        course_id, name, description, instructor, price, profile_pic
       );
   
       // Respond with the results
@@ -91,12 +93,25 @@ modulesRouter.get('/course/:id', async (req, res) => {
     }
 });
 
-// Update module by ID
-modulesRouter.put('/:id', async (req, res) => {
+// Get module by teacher ID
+modulesRouter.get('/teacher/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        const { course_id, name, description, instructor, profile_pic } = req.body;
-        const result = await modulesDbOperations.updateModule(id, course_id, name, description, instructor, profile_pic);
+        const result = await modulesDbOperations.getModuleByTeacherId(id);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
+// Update module by ID
+modulesRouter.put('/:id', upload.none(), async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { course_id, name, description, instructor, price } = req.body;
+        console.log(req.body);
+        const result = await modulesDbOperations.updateModule(id, course_id, name, description, instructor, price);
         res.json(result);
     } catch (e) {
         console.log(e);

@@ -51,6 +51,18 @@ resultsRouter.get('/mod/:modID/:stuID', async (req, res) => {
     }
 });
 
+// Get result by student ID
+resultsRouter.get('/mod/:modID/', async (req, res) => {
+    try {
+        const modID = req.params.modID;
+        const result = await resultsDbOperations.getResultModuleById(modID);
+        res.json(result);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+    }
+});
+
 // Update result by ID
 resultsRouter.put('/:id', async (req, res) => {
     try {

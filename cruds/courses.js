@@ -54,6 +54,17 @@ crudsObj.updateCourse = (course_id, college_id, name, description, instructor, p
     });
 };
 
+crudsObj.updateCourse2 = (id, name, description) => {
+    return new Promise((resolve, reject) => {
+        pool.query('UPDATE courses SET name = ?, description = ? WHERE course_id = ?',
+            [name, description, id],
+            (err, result) => {
+                if (err) return reject(err);
+                return resolve({ status: '200', message: 'Course record updated successfully' });
+            });
+    });
+};
+
 crudsObj.deleteCourse = (course_id) => {
     return new Promise((resolve, reject) => {
         pool.query('DELETE FROM courses WHERE course_id = ?', [course_id], (err, results) => {
