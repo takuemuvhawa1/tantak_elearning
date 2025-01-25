@@ -24,7 +24,6 @@ crudsObj.postUser = (name, surname, email, phone, hashedPassword) => {
                         return resolve({ status: '200', message: 'User created successfully' });
                     });
 
-
                 return resolve({ status: '200', message: 'User created successfully' });
             });
     });

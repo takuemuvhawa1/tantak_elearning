@@ -159,169 +159,169 @@ app.get('/download/:filename', (req, res) => {
   });
 });
 
-// app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date', async (req, res) => {
-
-//   console.log("Point reached")
-
-//   const course_id = req.params.course_id;
-//   const module_id = req.params.module_id;
-//   const student_id = req.params.student_id;
-//   const amount = req.params.amount;
-//   const exp_date = req.params.exp_date;
-
-//   const axios = require('axios');
-
-//   // Sample data to post
-//   const data = {
-//     course_id,
-//     module_id,
-//     student_id,
-//     amount,
-//     exp_date
-//   };
-
-//   const data2 = {
-//     module_id,
-//     student_id,
-//     amount
-//   };
-
-//   // Post request
-//   axios.post(`${pool}/subscriptions/`, data)
-//     .then(response => {
-//       console.log('Response Data:', response.data);
-//     })
-//     .catch(error => {
-//       console.error('Error:', error);
-//     });
-
-//   // Post to accounts
-//   axios.post(`${pool}/account/`, data2)
-//     .then(response => {
-//       console.log('Response Data:', response.data);
-//     })
-//     .catch(error => {
-//       console.error('Error:', error);
-//     });
-
-// }
-
-// );
-
 app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date', async (req, res) => {
-  try {
-    const course_id = req.params.course_id;
-    const module_id = req.params.module_id;
-    const student_id = req.params.student_id;
-    const amount = req.params.amount;
-    const exp_date = req.params.exp_date;
 
+  console.log("Point reached")
 
-    const currencyCode = 'USD'; // Update with the actual currency code
-    const paymentReason = 'E-Learning subscription'; // Update with the actual payment reason
+  const course_id = req.params.course_id;
+  const module_id = req.params.module_id;
+  const student_id = req.params.student_id;
+  const amount = req.params.amount;
+  const exp_date = req.params.exp_date;
 
-    const transaction = pesepayInstance.createTransaction(amount, currencyCode, paymentReason);
+  const axios = require('axios');
 
-    pesepayInstance.resultUrl = resultUrl;
-    pesepayInstance.returnUrl = returnUrl;
+  // Sample data to post
+  const data = {
+    course_id,
+    module_id,
+    student_id,
+    amount,
+    exp_date
+  };
 
-    pesepayInstance.initiateTransaction(transaction).then(response => {
-      console.log(response);
-      if (response.success) {
-        const redirectUrl = response.redirectUrl;
-        const referenceNumber = response.referenceNumber;
-        const pollUrl = response.pollUrl;
+  const data2 = {
+    module_id,
+    student_id,
+    amount
+  };
 
-        // Check payment status
-        pesepayInstance.pollTransaction(pollUrl).then(response => {
-          if (response.success) {
-            if (response.paid) {
-              console.log('Payment was successful');
-            } else {
-              console.log('Payment is pending');
-
-              let loops = 0;
-              let paymentProcessed = false; // Flag to prevent double posting
-              const intervalId = setInterval(() => {
-                pesepayInstance.checkPayment(referenceNumber).then(response => {
-                  if (response.success) {
-                    if (response.paid && !paymentProcessed) {
-                      console.log('Payment was successful');
-
-                      const axios = require('axios');
-
-                      // Sample data to post
-                      const data = {
-                        course_id,
-                        module_id,
-                        student_id,
-                        amount,
-                        exp_date
-                      };
-
-                      const data2 = {
-                        module_id,
-                        student_id,
-                        amount
-                      };
-
-                      // Post request
-                      axios.post(`${pool}/subscriptions/`, data)
-                        .then(response => {
-                          console.log('Response Data:', response.data);
-                        })
-                        .catch(error => {
-                          console.error('Error:', error);
-                        });
-
-                      // Post to accounts
-                      axios.post(`${pool}/account/`, data2)
-                        .then(response => {
-                          console.log('Response Data:', response.data);
-                        })
-                        .catch(error => {
-                          console.error('Error:', error);
-                        });
-
-                      paymentProcessed = true; // Set the flag to true to prevent further posting
-                      clearInterval(intervalId);
-                    }
-                  } else {
-                    console.error(`Error: ${response.message}`);
-                  }
-                }).catch(error => {
-                  console.error(error);
-                });
-                loops++;
-                if (loops >= 18) {
-                  clearInterval(intervalId);
-                }
-              }, 5000); // Check every 5 seconds
-            }
-          } else {
-            console.error(`Error: ${response.message}`);
-          }
-        }).catch(error => {
-          console.error(error);
-        });
-
-        res.redirect(redirectUrl);
-      } else {
-        console.error(`Error: ${response.message}`);
-        res.status(500).send({ error: 'Failed to initiate payment' });
-      }
-    }).catch(error => {
-      console.error(error);
-      res.status(500).send({ error: 'Failed to initiate payment' });
+  // Post request
+  axios.post(`${pool}/subscriptions/`, data)
+    .then(response => {
+      console.log('Response Data:', response.data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
     });
 
+  // Post to accounts
+  axios.post(`${pool}/account/`, data2)
+    .then(response => {
+      console.log('Response Data:', response.data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+
+}
+
+);
+
+// app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date', async (req, res) => {
+//   try {
+//     const course_id = req.params.course_id;
+//     const module_id = req.params.module_id;
+//     const student_id = req.params.student_id;
+//     const amount = req.params.amount;
+//     const exp_date = req.params.exp_date;
 
 
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
+//     const currencyCode = 'USD'; // Update with the actual currency code
+//     const paymentReason = 'E-Learning subscription'; // Update with the actual payment reason
+
+//     const transaction = pesepayInstance.createTransaction(amount, currencyCode, paymentReason);
+
+//     pesepayInstance.resultUrl = resultUrl;
+//     pesepayInstance.returnUrl = returnUrl;
+
+//     pesepayInstance.initiateTransaction(transaction).then(response => {
+//       console.log(response);
+//       if (response.success) {
+//         const redirectUrl = response.redirectUrl;
+//         const referenceNumber = response.referenceNumber;
+//         const pollUrl = response.pollUrl;
+
+//         // Check payment status
+//         pesepayInstance.pollTransaction(pollUrl).then(response => {
+//           if (response.success) {
+//             if (response.paid) {
+//               console.log('Payment was successful');
+//             } else {
+//               console.log('Payment is pending');
+
+//               let loops = 0;
+//               let paymentProcessed = false; // Flag to prevent double posting
+//               const intervalId = setInterval(() => {
+//                 pesepayInstance.checkPayment(referenceNumber).then(response => {
+//                   if (response.success) {
+//                     if (response.paid && !paymentProcessed) {
+//                       console.log('Payment was successful');
+
+//                       const axios = require('axios');
+
+//                       // Sample data to post
+//                       const data = {
+//                         course_id,
+//                         module_id,
+//                         student_id,
+//                         amount,
+//                         exp_date
+//                       };
+
+//                       const data2 = {
+//                         module_id,
+//                         student_id,
+//                         amount
+//                       };
+
+//                       // Post request
+//                       axios.post(`${pool}/subscriptions/`, data)
+//                         .then(response => {
+//                           console.log('Response Data:', response.data);
+//                         })
+//                         .catch(error => {
+//                           console.error('Error:', error);
+//                         });
+
+//                       // Post to accounts
+//                       axios.post(`${pool}/account/`, data2)
+//                         .then(response => {
+//                           console.log('Response Data:', response.data);
+//                         })
+//                         .catch(error => {
+//                           console.error('Error:', error);
+//                         });
+
+//                       paymentProcessed = true; // Set the flag to true to prevent further posting
+//                       clearInterval(intervalId);
+//                     }
+//                   } else {
+//                     console.error(`Error: ${response.message}`);
+//                   }
+//                 }).catch(error => {
+//                   console.error(error);
+//                 });
+//                 loops++;
+//                 if (loops >= 18) {
+//                   clearInterval(intervalId);
+//                 }
+//               }, 5000); // Check every 5 seconds
+//             }
+//           } else {
+//             console.error(`Error: ${response.message}`);
+//           }
+//         }).catch(error => {
+//           console.error(error);
+//         });
+
+//         res.redirect(redirectUrl);
+//       } else {
+//         console.error(`Error: ${response.message}`);
+//         res.status(500).send({ error: 'Failed to initiate payment' });
+//       }
+//     }).catch(error => {
+//       console.error(error);
+//       res.status(500).send({ error: 'Failed to initiate payment' });
+//     });
+
+
+
+//   } catch (e) {
+//     console.log(e);
+//     res.sendStatus(500);
+//   }
+// });
 
 
 
@@ -334,7 +334,19 @@ app.get('/initiate-payment/:course_id/:module_id/:student_id/:amount/:exp_date',
 //   console.log('app is listening to port' + process.env.APPPORT);
 // });
 
+// Load SSL certificates
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/srv702611.hstgr.cloud/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/srv702611.hstgr.cloud/fullchain.pem')
+};
 
-app.listen(process.env.APPPORT || '3003', () => {
-  console.log('app is listening to port' + process.env.APPPORT);
+// Create HTTPS server
+const PORT = process.env.APPPORT || '3006';
+https.createServer(options, app).listen(PORT, () => {
+  console.log(`App is listening on https://srv702611.hstgr.cloud:${PORT}`);
 });
+
+
+// app.listen(process.env.APPPORT || '3006', () => {
+//   console.log('app is listening to port' + process.env.APPPORT);
+// });
